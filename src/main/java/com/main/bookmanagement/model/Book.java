@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Data
 @Entity
 @AllArgsConstructor
@@ -20,10 +22,9 @@ public class Book {
     @Builder.Default
     private boolean isAvailable = true;
 
-    @Builder.Default
-    @Column(nullable = true)
-    private String borrower = null;
-    @Builder.Default
-    @Column(nullable = true)
-    private LocalDate dueDate = null;
+    @ManyToOne
+    @JoinColumn(name = "borrower_id")
+    @JsonBackReference
+    private Borrower borrower;
+    private LocalDate dueDate;
 }

@@ -7,12 +7,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.main.bookmanagement.model.Book;
+import com.main.bookmanagement.model.Borrower;
 import com.main.bookmanagement.repository.BookRepository;
+import com.main.bookmanagement.repository.BorrowerRepository;
 
 @Service
 public class BookService {
     @Autowired
     private final BookRepository bookRepository = null;
+
+    @Autowired
+    private final BorrowerRepository borrowerRepository = null;
 
     public List<Book> getAllBooks() {
         return bookRepository.findAll();
@@ -22,10 +27,12 @@ public class BookService {
         return bookRepository.save(book);
     }
 
-    public Book borrowBook(Long id, String borrower) {
+    public Book borrowBook(Long id, Borrower borrower) {
+
         Book book = bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
         if (book.isAvailable()) {
             book.setAvailable(false);
+            borrower = borrowerRepository.save(borrower);
             book.setBorrower(borrower);
             book.setDueDate(LocalDate.now().plusWeeks(2));
             return bookRepository.save(book);
