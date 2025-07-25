@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.main.bookmanagement.Service.BookService;
 import com.main.bookmanagement.model.Book;
+import com.main.bookmanagement.model.Borrower;
 
 @RestController
 @RequestMapping("/books")
@@ -31,8 +31,8 @@ public class BookController {
     }
 
     @PostMapping("/{id}/borrow")
-    public Book borrowBook(@PathVariable Long id, @RequestParam String borrower) {
-        return bookService.borrowBook(id, borrower);
+    public Book borrowBook(@PathVariable Long id, @RequestBody Borrower borrowerName) {
+        return bookService.borrowBook(id, borrowerName);
     }
 
     @PostMapping("/{id}/return")
