@@ -1,26 +1,37 @@
 package com.main.bookmanagement.util;
 
+import java.util.Date;
+
+import javax.crypto.SecretKey;
+
 import org.springframework.stereotype.Component;
 
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JWTUtil {
-    // This class will contain methods for JWT token generation and validation
 
-    private final String SECRET = "secretkey"; // Use env variable in production
+    private static final String SECRET = "mysecretkeymysecretkeymysecretkey!";
+    private static final long EXPIRATION_TIME = 86400000; // 1 day in milliseconds
+
+    private final SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes());
 
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
-                .signWith(SignatureAlgorithm.HS256, SECRET)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public String extractUsername(String token) {
-        return Jwts.parser()
-                .setSigningKey(SECRET)
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
@@ -28,9 +39,10 @@ public class JWTUtil {
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(SECRET).parseClaimsJwt(token);
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
-        } catch (Exception e) {
+        } catch (JwtException | IllegalArgumentException e) {
+            // log or handle invalid token
             return false;
         }
     }
